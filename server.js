@@ -8,13 +8,16 @@ const PORT = 4000;
 let Song = require('./songModel.js');
 app.use(cors());
 app.use(bodyParser.json());
-mongoose.connect('mongodb://127.0.0.1:27017/Songs', {useUnifiedTopology: true,   useNewUrlParser: true });
+mongoose.connect('mongodb://127.0.0.1:27017/Songs', {
+    useUnifiedTopology: true,
+    useNewUrlParser: true
+});
 const connection = mongoose.connection;
-connection.once('open', function() {
+connection.once('open', function () {
     console.log("MongoDB database connection established successfully");
 })
-songRoutes.route('/').get(function(req, res) {
-    Song.find(function(err, songs) {
+songRoutes.route('/').get(function (req, res) {
+    Song.find(function (err, songs) {
         if (err) {
             console.log(err);
         } else {
@@ -22,22 +25,22 @@ songRoutes.route('/').get(function(req, res) {
         }
     });
 });
-songRoutes.route('/:id').get(function(req, res) {
+songRoutes.route('/:id').get(function (req, res) {
     let id = req.params.id;
-    Song.findById(id, function(err, song) {
+    Song.findById(id, function (err, song) {
         res.json(song);
     });
 });
-songRoutes.route('/update/:id').post(function(req, res) {
-    Song.findById(req.params.id, function(err, song) {
+songRoutes.route('/update/:id').post(function (req, res) {
+    Song.findById(req.params.id, function (err, song) {
         if (!song)
             res.status(404).send("data is not found");
         else
             song.nome = req.body.nome;
-            song.country = req.body.country;
-            song.youtube = req.body.youtube;
-            song.likes = req.body.likes;
-            song.save().then(song => {
+        song.country = req.body.country;
+        song.youtube = req.body.youtube;
+        song.likes = req.body.likes;
+        song.save().then(song => {
                 res.json('Song updated!');
             })
             .catch(err => {
@@ -45,39 +48,43 @@ songRoutes.route('/update/:id').post(function(req, res) {
             });
     });
 });
-songRoutes.route('/add').post(function(req, res) {
+songRoutes.route('/add').post(function (req, res) {
     let song = new Song(req.body);
     song.save()
         .then(song => {
-            res.status(200).json({'song': 'song added successfully'});
+            res.status(200).json({
+                'song': 'song added successfully'
+            });
         })
         .catch(err => {
             res.status(400).send('adding new song failed');
         });
 });
-songRoutes.route('/add/bulk').post(function(req, res) {
-    Song.insertMany(req.body, function(error, docs) {
-        if (error!== null){
-            res.status(200).send('bulk methond worked correctly: '+docs)
-        }else{
-            res.status(400).send('error on bulk method: '+error)
+songRoutes.route('/add/bulk').post(function (req, res) {
+    Song.insertMany(req.body, function (error, docs) {
+        if (!error) {
+            res.status(200).send('bulk methond worked correctly: ' + docs)
+        } else {
+            res.status(400).send('error on bulk method: ' + error,docs)
         }
     });
 });
 
-router.route('/delete-student/:id').delete((req, res, next) => {
+songRoutes.route('/delete/:id').delete((req, res, next) => {
     Song.findByIdAndRemove(req.params.id, (error, data) => {
-      if (error) {
-        return next(error);
-      } else {
-        res.status(200).json({
-          "msg": data
-        })
-      }
+        if (error) {
+            res.status(400).json({
+                "error": next(error)
+            })
+        } else {
+            res.status(200).json({
+                "msg": data
+            })
+        }
     })
-  });
+});
 
 app.use('/Songs', songRoutes);
-app.listen(PORT, function() {
+app.listen(PORT, function () {
     console.log("Server is running on Port: " + PORT);
 });
