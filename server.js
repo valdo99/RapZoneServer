@@ -56,12 +56,7 @@ songRoutes.route('/add').post(function(req, res) {
         });
 });
 songRoutes.route('/add/bulk').post(function(req, res) {
-    Song.insertMany(req.body, function(error, docs) {}).then(song => {
-        res.status(200).json({'song': 'song added successfully'});
-    })
-    .catch(err => {
-        res.status(400).send('adding new song failed');
-    });
+    Song.insertMany(req.body, function(error, docs) {})
 });
 
 
