@@ -36,7 +36,7 @@ songRoutes.route('/update/:id').post(function (req, res) {
         if (!song)
             res.status(404).send("data is not found");
         else
-            song.nome = req.body.nome;
+        song.nome = req.body.nome;
         song.country = req.body.country;
         song.youtube = req.body.youtube;
         song.likes = req.body.likes;
@@ -62,10 +62,10 @@ songRoutes.route('/add').post(function (req, res) {
 });
 songRoutes.route('/add/bulk').post(function (req, res) {
     Song.insertMany(req.body, function (error, docs) {
-        if (!error) {
+        if (error === null ) {
             res.status(200).send('bulk methond worked correctly: ' + docs)
         } else {
-            res.status(400).send('error on bulk method: ' + error,docs)
+            res.status(400).send('error on bulk method: ' + error)
         }
     });
 });
