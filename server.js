@@ -61,6 +61,17 @@ songRoutes.route('/add/bulk').post(function(req, res) {
     })
 });
 
+router.route('/delete-student/:id').delete((req, res, next) => {
+    Song.findByIdAndRemove(req.params.id, (error, data) => {
+      if (error) {
+        return next(error);
+      } else {
+        res.status(200).json({
+          "msg": data
+        })
+      }
+    })
+  });
 
 app.use('/Songs', songRoutes);
 app.listen(PORT, function() {
